@@ -1,6 +1,10 @@
-@TaskManager.Api_HostAddress = http://localhost:5284
+@TaskManager_Api_HostAddress = http://localhost:5284
 
-GET {{TaskManager.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+POST {{TaskManager_Api_HostAddress}}/tasks
+Content-Type: application/json
 
-###
+{
+  "title": "Finish GitHub project",
+  "description": "Add POST endpoint",
+  "isCompleted": false
+}
