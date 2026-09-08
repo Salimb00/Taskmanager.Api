@@ -1,9 +1,13 @@
 using TaskManager.Api.Models;
+using Microsoft.EntityFrameworkCore;
+using TaskManager.Api.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddDbContext<TaskDbContext>(options =>
+    options.UseSqlite("Data Source=tasks.db"));
 
 var app = builder.Build();
 
@@ -15,37 +19,24 @@ if (app.Environment.IsDevelopment())
 
 app.MapGet("/", () => "Task Manager API is running");
 
-var tasks = new List<TodoTask>
-{
-    new TodoTask
-    {
-        Id = 1,
-        Title = "Learn ASP.NET Core",
-        Description = "Build the first Task Manager API endpoint",
-        IsCompleted = false
-    },
 
-    new TodoTask
-    {
-        Id = 2,
-        Title = "Update GitHub",
-        Description = "Push the latest project changes",
-        IsCompleted = true
-    }
-};
-
-app.MapGet("/tasks", () => tasks);
-app.MapGet("/tasks/{id}", (int id) =>
+app.MapGet("/tasks", async (TaskDbContext db) =>
 {
-    var task = tasks.FirstOrDefault(t => t.Id == id);
+    var tasks = await db.Tasks.ToListAsync();
+
+    return Results.Ok(tasks);
+});
+app.MapGet("/tasks/{id}", async (int id, TaskDbContext db) =>
+{
+    var task = await db.Tasks.FindAsync(id);
 
     return task is not null
         ? Results.Ok(task)
         : Results.NotFound();
 });
-app.MapPut("/tasks/{id}", (int id, TodoTask updatedTask) =>
+app.MapPut("/tasks/{id}", async (int id, TodoTask updatedTask, TaskDbContext db) =>
 {
-    var task = tasks.FirstOrDefault(t => t.Id == id);
+    var task = await db.Tasks.FindAsync(id);
 
     if (task is null)
     {
@@ -56,29 +47,33 @@ app.MapPut("/tasks/{id}", (int id, TodoTask updatedTask) =>
     task.Description = updatedTask.Description;
     task.IsCompleted = updatedTask.IsCompleted;
 
+    await db.SaveChangesAsync();
+
     return Results.Ok(task);
 });
 
-app.MapDelete("/tasks/{id}", (int id) =>
+app.MapDelete("/tasks/{id}", async (int id, TaskDbContext db) =>
 {
-    var task = tasks.FirstOrDefault(t => t.Id == id);
+    var task = await db.Tasks.FindAsync(id);
 
     if (task is null)
     {
         return Results.NotFound();
     }
 
-    tasks.Remove(task);
+    db.Tasks.Remove(task);
+
+    await db.SaveChangesAsync();
 
     return Results.NoContent();
 });
 
-app.MapPost("/tasks", (TodoTask newTask) =>
+app.MapPost("/tasks", async (TodoTask newTask, TaskDbContext db) =>
 {
-    newTask.Id = tasks.Count + 1;
+    db.Tasks.Add(newTask);
 
-    tasks.Add(newTask);
+    await db.SaveChangesAsync();
 
     return Results.Created($"/tasks/{newTask.Id}", newTask);
-});
+});;
 app.Run();
