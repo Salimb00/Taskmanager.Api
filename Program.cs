@@ -43,6 +43,36 @@ app.MapGet("/tasks/{id}", (int id) =>
         ? Results.Ok(task)
         : Results.NotFound();
 });
+app.MapPut("/tasks/{id}", (int id, TodoTask updatedTask) =>
+{
+    var task = tasks.FirstOrDefault(t => t.Id == id);
+
+    if (task is null)
+    {
+        return Results.NotFound();
+    }
+
+    task.Title = updatedTask.Title;
+    task.Description = updatedTask.Description;
+    task.IsCompleted = updatedTask.IsCompleted;
+
+    return Results.Ok(task);
+});
+
+app.MapDelete("/tasks/{id}", (int id) =>
+{
+    var task = tasks.FirstOrDefault(t => t.Id == id);
+
+    if (task is null)
+    {
+        return Results.NotFound();
+    }
+
+    tasks.Remove(task);
+
+    return Results.NoContent();
+});
+
 app.MapPost("/tasks", (TodoTask newTask) =>
 {
     newTask.Id = tasks.Count + 1;
