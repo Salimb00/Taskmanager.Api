@@ -2,11 +2,13 @@ using TaskManager.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Api.Data;
 using TaskManager.Api.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
 builder.Services.AddDbContext<TaskDbContext>(options =>
     options.UseSqlite("Data Source=tasks.db"));
 
@@ -19,7 +21,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapGet("/", () => "Task Manager API is running");
-
 
 app.MapGet("/tasks", async (bool? completed, string? priority, TaskDbContext db) =>
 {
@@ -42,25 +43,12 @@ app.MapGet("/tasks", async (bool? completed, string? priority, TaskDbContext db)
 
 app.MapPut("/tasks/{id}", async (int id, TodoTask updatedTask, TaskDbContext db) =>
 {
-    if (string.IsNullOrWhiteSpace(updatedTask.Title))
-    {
-        return Results.BadRequest("Title is required.");
-    }
+    var validationError = TaskValidator.ValidateTask(updatedTask);
 
-    if (updatedTask.Title.Length > 100)
+    if (validationError is not null)
     {
-        return Results.BadRequest("Title cannot be longer than 100 characters.");
+        return Results.BadRequest(validationError);
     }
-
-    if (updatedTask.Description.Length > 500)
-    {
-        return Results.BadRequest("Description cannot be longer than 500 characters.");
-    }
-
-    if (!IsValidPriority(updatedTask.Priority))
-{
-    return Results.BadRequest("Priority must be Low, Medium, or High.");
-}
 
     var task = await db.Tasks.FindAsync(id);
 
@@ -75,7 +63,7 @@ app.MapPut("/tasks/{id}", async (int id, TodoTask updatedTask, TaskDbContext db)
     task.Priority = updatedTask.Priority;
     task.DueDate = updatedTask.DueDate;
 
-await db.SaveChangesAsync();
+    await db.SaveChangesAsync();
 
     return Results.Ok(task);
 });
@@ -98,36 +86,18 @@ app.MapDelete("/tasks/{id}", async (int id, TaskDbContext db) =>
 
 app.MapPost("/tasks", async (TodoTask newTask, TaskDbContext db) =>
 {
-    if (string.IsNullOrWhiteSpace(newTask.Title))
-    {
-        return Results.BadRequest("Title is required.");
-    }
+    var validationError = TaskValidator.ValidateTask(newTask);
 
-    if (newTask.Title.Length > 100)
+    if (validationError is not null)
     {
-        return Results.BadRequest("Title cannot be longer than 100 characters.");
-    }
-
-    if (newTask.Description.Length > 500)
-    {
-        return Results.BadRequest("Description cannot be longer than 500 characters.");
+        return Results.BadRequest(validationError);
     }
 
     db.Tasks.Add(newTask);
-
-    if (!IsValidPriority(newTask.Priority))
-    {
-    return Results.BadRequest("Priority must be Low, Medium, or High.");
-    }
 
     await db.SaveChangesAsync();
 
     return Results.Created($"/tasks/{newTask.Id}", newTask);
 });
-
-static bool IsValidPriority(string priority)
-{
-    return priority is "Low" or "Medium" or "High";
-}
 
 app.Run();
