@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "VK7fApgGWCM=",
+  "dgSpecHash": "Tik1yMJR7gU=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Salim\\Projects\\TaskManager.Api.Tests\\TaskManager.Api.Tests.csproj",
+  "projectFilePath": "C:\\Users\\Salim\\Projects\\TaskManager\\TaskManager.Api.Tests\\TaskManager.Api.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Salim\\.nuget\\packages\\coverlet.collector\\6.0.4\\coverlet.collector.6.0.4.nupkg.sha512",
     "C:\\Users\\Salim\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.11\\microsoft.aspnetcore.openapi.10.0.11.nupkg.sha512",

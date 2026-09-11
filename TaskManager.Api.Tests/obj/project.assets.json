@@ -1999,11 +1999,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Salim\\Projects\\TaskManager.Api.Tests\\TaskManager.Api.Tests.csproj",
+      "projectUniqueName": "C:\\Users\\Salim\\Projects\\TaskManager\\TaskManager.Api.Tests\\TaskManager.Api.Tests.csproj",
       "projectName": "TaskManager.Api.Tests",
-      "projectPath": "C:\\Users\\Salim\\Projects\\TaskManager.Api.Tests\\TaskManager.Api.Tests.csproj",
+      "projectPath": "C:\\Users\\Salim\\Projects\\TaskManager\\TaskManager.Api.Tests\\TaskManager.Api.Tests.csproj",
       "packagesPath": "C:\\Users\\Salim\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Salim\\Projects\\TaskManager.Api.Tests\\obj\\",
+      "outputPath": "C:\\Users\\Salim\\Projects\\TaskManager\\TaskManager.Api.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Salim\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -2019,8 +2019,8 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\Users\\Salim\\Projects\\TaskManager.Api\\TaskManager.Api.csproj": {
-              "projectPath": "C:\\Users\\Salim\\Projects\\TaskManager.Api\\TaskManager.Api.csproj"
+            "C:\\Users\\Salim\\Projects\\TaskManager\\TaskManager.Api\\TaskManager.Api.csproj": {
+              "projectPath": "C:\\Users\\Salim\\Projects\\TaskManager\\TaskManager.Api\\TaskManager.Api.csproj"
             }
           }
         }
