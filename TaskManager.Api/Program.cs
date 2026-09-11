@@ -5,8 +5,7 @@ using TaskManager.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// Add services to the container
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<TaskDbContext>(options =>
@@ -14,14 +13,16 @@ builder.Services.AddDbContext<TaskDbContext>(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
+// Root endpoint
 app.MapGet("/", () => "Task Manager API is running");
 
+// GET all tasks + optional filters
 app.MapGet("/tasks", async (bool? completed, string? priority, TaskDbContext db) =>
 {
     var query = db.Tasks.AsQueryable();
@@ -41,6 +42,20 @@ app.MapGet("/tasks", async (bool? completed, string? priority, TaskDbContext db)
     return Results.Ok(tasks);
 });
 
+// GET a single task by ID
+app.MapGet("/tasks/{id}", async (int id, TaskDbContext db) =>
+{
+    var task = await db.Tasks.FindAsync(id);
+
+    if (task is null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(task);
+});
+
+// UPDATE a task
 app.MapPut("/tasks/{id}", async (int id, TodoTask updatedTask, TaskDbContext db) =>
 {
     var validationError = TaskValidator.ValidateTask(updatedTask);
@@ -68,6 +83,7 @@ app.MapPut("/tasks/{id}", async (int id, TodoTask updatedTask, TaskDbContext db)
     return Results.Ok(task);
 });
 
+// DELETE a task
 app.MapDelete("/tasks/{id}", async (int id, TaskDbContext db) =>
 {
     var task = await db.Tasks.FindAsync(id);
@@ -84,6 +100,7 @@ app.MapDelete("/tasks/{id}", async (int id, TaskDbContext db) =>
     return Results.NoContent();
 });
 
+// CREATE a task
 app.MapPost("/tasks", async (TodoTask newTask, TaskDbContext db) =>
 {
     var validationError = TaskValidator.ValidateTask(newTask);
@@ -101,3 +118,6 @@ app.MapPost("/tasks", async (TodoTask newTask, TaskDbContext db) =>
 });
 
 app.Run();
+
+// Makes Program accessible to integration tests
+public partial class Program { }
